@@ -41,9 +41,10 @@ sub collect {
 }
 
 
-# insert ( self, domain_name )
+# insert ( self, domain_name, mode:=insert )
 sub insert {
-    my ( $self, $domain_name ) = @_;
+    my ( $self, $domain_name, $mode ) = @_;
+    if ( not defined $mode ) { $mode = 1; }
 
     # lowercase -> split on "." -> ignore empty parts
     my @key_path = grep { '/./' } ( split /[.]/mx, lc $domain_name );
@@ -58,13 +59,21 @@ sub insert {
     }
 
     # insert
-    $self->{_root}->insert ( \@key_path );
+    if ( $mode == 1 ) {
+        $self->{_root}->insert ( \@key_path );
+
+    } elsif ( $mode == 2 ) {
+        $self->{_root}->insert_purge ( \@key_path );
+
+    } else {
+        die "unknown insert mode: ${mode}\n";
+    }
 
     return 1;
 }
 
 
-# feed_line ( self, line ) -> insert(...)
+# feed_line ( self, line, mode ) -> insert(...)
 sub feed_line {
     my $self = shift;
     return $self->insert ( @_ );
