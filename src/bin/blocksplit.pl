@@ -158,7 +158,7 @@ sub main {
     );
 
     if ( scalar @ARGV ) {
-        Blut::FileIO::read_files_feed_object ( $splitter, @ARGV ) or die "Failed to process input files\n";
+        Blut::FileIO::read_files_feed_object ( $splitter, \@ARGV ) or die "Failed to process input files\n";
 
     } else {
         Blut::FileIO::read_fh_feed_object ( $splitter, *STDIN ) or die "Failed to read input\n";
