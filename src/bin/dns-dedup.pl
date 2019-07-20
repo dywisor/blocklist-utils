@@ -80,14 +80,9 @@ sub main {
     my $tree = Blut::DnsDedup::Tree->new ( $autocol_depth );
 
     if ( scalar @ARGV ) {
-        foreach (@ARGV) {
-            open my $infh, '<', $_ or die "Failed to open input file: $!\n";
-            $tree->read_fh ( $infh );
-            close $infh or warn "Failed to close input file: $!\n";
-        }
-
+        Blut::FileIO::read_files_feed_object ( $tree, @ARGV ) or die;
     } else {
-        Blut::FileIO::read_fh_feed_object ( $tree, *STDIN );
+        Blut::FileIO::read_fh_feed_object ( $tree, *STDIN ) or die;
     }
 
     my @domains = @{ $tree->collect() };
@@ -104,14 +99,9 @@ sub main {
 
     # write output file
     if ( defined $outfile ) {
-        my $outfh;
-
-        open $outfh, '>', $outfile or die "Failed to open outfile: $!\n";
-        $ret = Blut::FileIO::write_to_fh ( $outfh, \@domains, $out_formatter );
-        close $outfh or warn "Failed to close outfile: $!\n";
+        $ret = Blut::FileIO::write_to_file ( $outfile, \@domains, $out_formatter );
 
     } else {
-        #$ret = write_domains_to_fh ( *STDOUT, \@domains, $outformat, $outformat_arg );
         $ret = Blut::FileIO::write_to_fh ( *STDOUT, \@domains, $out_formatter );
     }
 
