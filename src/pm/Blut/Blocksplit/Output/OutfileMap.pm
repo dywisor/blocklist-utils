@@ -45,3 +45,6 @@ sub get_file {
         return Blut::Blocksplit::Output::Null->new();
     }
 }
+
+
+1;

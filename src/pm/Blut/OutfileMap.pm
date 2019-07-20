@@ -56,3 +56,6 @@ sub open_file {
         return $fh;
     }
 }
+
+
+1;

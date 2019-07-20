@@ -18,7 +18,7 @@ DOINS    = $(INSTALL) -D -m $(INSMODE)
 
 X_PERLCRITIC = perlcritic
 PERLCRITIC_OPTS  =
-PERLCRITIC_OPTS += --brutal
+PERLCRITIC_OPTS += --harsh
 PERLCRITIC_OPTS += --verbose 11
 PERLCRITIC_OPTS += --exclude CodeLayout::RequireTidyCode
 PERLCRITIC_OPTS += --exclude Modules::ProhibitMultiplePackages
@@ -27,6 +27,9 @@ PERLCRITIC_OPTS += --exclude ValuesAndExpressions::ProhibitNoisyQuotes
 PERLCRITIC_OPTS += --exclude RegularExpressions::RequireDotMatchAnything
 PERLCRITIC_OPTS += --exclude ControlStructures::ProhibitPostfixControls
 PERLCRITIC_OPTS += --exclude Variables::ProhibitPunctuationVars
+PERLCRITIC_OPTS += --exclude RegularExpressions::ProhibitComplexRegexes
+PERLCRITIC_OPTS += --exclude ErrorHandling::RequireCarping
+PERLCRITIC_OPTS += --exclude Subroutines::ProhibitExcessComplexity
 
 
 all:

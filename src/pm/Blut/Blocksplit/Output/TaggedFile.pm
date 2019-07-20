@@ -29,3 +29,6 @@ sub add {
 
     return printf {$self->{_fh}} "%s:%s\n", $self->{_tag}, $arg;
 }
+
+
+1;

@@ -26,4 +26,8 @@ sub add {
     my ( $self, $arg ) = @_;
 
     printf {$self->{_fh}} "%s\n", $arg;
+    return 1;
 }
+
+
+1;

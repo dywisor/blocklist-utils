@@ -30,3 +30,6 @@ sub is_null {
 sub add {
     return 1;
 }
+
+
+1;

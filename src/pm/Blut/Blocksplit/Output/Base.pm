@@ -28,3 +28,6 @@ sub is_null {
 sub add {
     die "method not implemented: add()\n";
 }
+
+
+1;
