@@ -132,8 +132,12 @@ use warnings;
 sub new {
     my $class = shift;
     my $self  = {
-        _zone_type => (shift or 'always_nxdomain')
+        _zone_type => shift
     };
+
+    if ( not defined $self->{_zone_type} ) {
+        $self->{_zone_type} = 'always_nxdomain';
+    }
 
     return bless $self, $class;
 }

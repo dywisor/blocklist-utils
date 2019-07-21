@@ -1,11 +1,6 @@
 #!/usr/bin/perl
 # -*- coding: utf-8 -*-
 
-# FIXME: class inheritance
-# - how to @ISA when parent / subclass are in the same file?
-# - or create one file per class...
-#
-
 package BlocksplitMain;
 
 use strict;
