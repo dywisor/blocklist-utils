@@ -14,7 +14,7 @@ our $VERSION = '0.1';
 our $NAME    = 'blockfetch';
 
 my $prog_name   = File::Basename::basename($0);
-my $short_usage = "${prog_name} {-B <BL>|-C <CFG>|-c|-f|-h|-l|-O <O>|-s|-T <T>|-u}";
+my $short_usage = "${prog_name} {-B <BL>|-C <CFG>|-c|-f|-h|-l|-L <GRP>|-O <O>|-s|-T <T>|-u}";
 my $usage       = <<"EOF";
 ${NAME} ${VERSION}
 
@@ -77,7 +77,8 @@ Options:
   -f, --force-recreate      fetch and recreated all blocklists,
                             ignoring expiry
   -h, --help                print this help message and exit
-  -l, --list                list blocklist definitions
+  -l, --list                list all blocklist definitions
+  -L <GRP>, --group <GRP>   list blocklist definitions in the given group
   -O <O>                    output directory (default: ./bl)
   -s, --skip-dl             skip downloading if a file already exists,
                             regardless of age (useful together with -f)
@@ -99,6 +100,7 @@ sub main {
     # parse args
     my $bl_restrict_names = {};
     my $mode        = undef;
+    my $mode_arg    = undef;
     my $config_file = undef;
     my $output_dir  = undef;
     my $workdir     = undef;
@@ -113,6 +115,7 @@ sub main {
             'f|force-recreate'  => sub { $mode = 'force-recreate'; },
             'h|help'            => \$want_help,
             'l|list'            => sub { $mode = 'list'; },
+            'L|group=s'         => sub { $mode = 'list-group'; $mode_arg = $_[1]; },
             'O=s'               => \$output_dir,
             's|skip-dl'         => \$want_skipdl,
             'T=s'               => \$workdir,
@@ -168,10 +171,28 @@ sub main {
             }
         }
 
-    } elsif ( $mode eq 'list' ) {
+    } elsif ( ( $mode eq 'list' ) || ( ( $mode eq 'list-group' ) && ( $mode_arg eq 'all' ) ) ) {
+        my $exit_code = 2;
+
         foreach my $bl ( sort { $a->{name} cmp $b->{name} } @{ $blocklist_config->{bl} } ) {
             printf {*STDOUT} "%s\n", $bl->{name};
+            $exit_code = 0;
         }
+
+        return $exit_code;
+
+    } elsif ( $mode eq 'list-group' ) {
+        my $exit_code = 2;
+
+        # FIXME: grep then sort
+        foreach my $bl ( sort { $a->{name} cmp $b->{name} } @{ $blocklist_config->{bl} } ) {
+            if ( $bl->{groups}->{$mode_arg} ) {
+                printf {*STDOUT} "%s\n", $bl->{name};
+                $exit_code = 0;
+            }
+        }
+
+        return $exit_code;
 
     } elsif ( ($mode eq 'update') or ($mode eq 'force-recreate') ) {
         my $bl_expired;
@@ -412,6 +433,7 @@ sub new {
     my $self  = {
         enabled => (defined $args->{enabled}) ? $args->{enabled} : 1,
         name    => $args->{name},
+        groups  => {},
         expire  => $args->{expire},
         url     => $args->{url},
         xform   => $args->{xform},
@@ -426,6 +448,12 @@ sub new {
 
         expiry_info => undef
     };
+
+    if ( $args->{groups} ) {
+        foreach my $name ( @{ $args->{groups} } ) {
+            $self->{groups}->{$name} = 1;
+        }
+    }
 
     return bless $self, $class;
 }
