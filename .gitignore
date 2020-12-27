@@ -4,6 +4,10 @@
 /local
 /tmp
 
+# compiled progs
+/bin/ipset-gen
+/bin/unbound-redirect-gen
+
 *.tmp
 .keep
 

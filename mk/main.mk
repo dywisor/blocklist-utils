@@ -1,3 +1,7 @@
+S_BIN      := $(S)/bin
+S_SRC      := $(S)/src
+S_SRC_C    := $(S_SRC)/C
+
 DESTDIR     =
 PREFIX      = /usr/local
 EXEC_PREFIX = $(PREFIX)
@@ -31,8 +35,20 @@ PERLCRITIC_OPTS += --exclude RegularExpressions::ProhibitComplexRegexes
 PERLCRITIC_OPTS += --exclude ErrorHandling::RequireCarping
 PERLCRITIC_OPTS += --exclude Subroutines::ProhibitExcessComplexity
 
+all: progs
 
-all:
+# addprefix <> patsubst ^%
+
+progs: $(S_BIN)/ipset-gen $(S_BIN)/unbound-redirect-gen
+
+C_COMMON_DEP = $(S_SRC_C)/main.c $(S_SRC_C)/main.h
+LAZY_COMPILE_C_PROG = $(CC) -static -std=c99 -D_POSIX_C_SOURCE=200809L -O2 -pipe -Wall -Wextra -pedantic
+
+$(S_BIN)/ipset-gen: $(S_SRC_C)/ipset-gen.c $(C_COMMON_DEP)
+	$(LAZY_COMPILE_C_PROG) -o $(@) $(S_SRC_C)/ipset-gen.c
+
+$(S_BIN)/unbound-redirect-gen: $(S_SRC_C)/unbound-redirect-gen.c $(C_COMMON_DEP)
+	$(LAZY_COMPILE_C_PROG) -o $(@) $(S_SRC_C)/unbound-redirect-gen.c
 
 install:
 	false
@@ -45,4 +61,4 @@ check:
 		xargs -r -t -n 1 $(X_PERLCRITIC) $(PERLCRITIC_OPTS)
 
 
-.PHONY: all install uninstall check
+.PHONY: all progs install uninstall check
