@@ -1,0 +1,135 @@
+#!/usr/bin/perl
+
+use POSIX ();
+
+my $date_ymd = POSIX::strftime '%Y-%m-%d', gmtime();
+
+sub expire_minutes  { return ((shift) * 60); }
+sub expire_hours    { return ((shift) * 3600); }
+
+push @bl, {
+    name    => 'URLhaus',
+    groups  => ['grey'],
+    url     => 'https://urlhaus.abuse.ch/downloads/text/',
+    expire  => expire_minutes ( 5 )
+};
+
+push @bl, {
+    name    => 'URLhaus_rpz',
+    groups  => ['grey'],
+    url     => 'https://urlhaus.abuse.ch/downloads/rpz/',
+    expire  => expire_minutes ( 5 ),
+    xform   => sub {
+        my $arg = shift;
+
+        if ( $arg =~ m/^([a-z0-9_]\S+)\s+CNAME\s+[.](?:\s+.*)?$/mx ) {
+            return $1;
+        } else {
+            return undef;
+        }
+    }
+};
+
+push @bl, {
+    name    => 'sslbl',
+    groups  => ['black'],
+    url     => 'https://sslbl.abuse.ch/blacklist/sslipblacklist.txt',
+    expire  => expire_minutes ( 5 )
+};
+
+push @bl, {
+    name    => 'rw_dombl',
+    groups  => ['black'],
+    url     => 'https://ransomwaretracker.abuse.ch/downloads/RW_DOMBL.txt',
+    expire  => expire_minutes ( 5 )
+};
+
+push @bl, {
+    name    => 'rw_ipbl',
+    groups  => ['black'],
+    url     => 'https://ransomwaretracker.abuse.ch/downloads/RW_IPBL.txt',
+    expire  => expire_minutes ( 5 )
+};
+
+push @bl, {
+    name    => 'feodotracker',
+    groups  => ['black'],
+    url     => 'https://feodotracker.abuse.ch/downloads/ipblocklist.txt',
+    expire  => expire_minutes ( 5 )
+};
+
+
+my $autoshun_api_key = '';
+if ( $autoshun_api_key ) {
+    push @bl, {
+        enabled => 1,
+        name    => 'autoshun',
+        groups  => ['black'],
+        url     => (
+            'https://www.autoshun.org/download/?api_key=' . $autoshun_api_key . '&format=csv'
+        ),
+        expire  => expire_minutes ( 30 ),
+        xform   => sub { return Butil::csv_field ( 1, shift ); }
+    };
+}
+
+
+my $abuse_ipdb_api_key = '';
+if ( $abuse_ipdb_api_key ) {
+    push @bl, {
+        name    => 'abuse_ipdb',
+        groups  => ['black'],
+        url     => (
+            sprintf
+            'https://api.abuseipdb.com/api/v2/blacklist?key=%s&confidenceMinimum=%d&plaintext',
+            $abuse_ipdb_api_key,
+            90
+        ),
+        expire  => expire_hours ( 12 ),
+    };
+}
+
+push @bl, {
+    name    => 'isc-sans-edu_attacks',
+    groups  => ['black'],
+    url     => (
+        'https://isc.sans.edu/api/sources/attacks/500/' . $date_ymd . '/?csv'
+    ),
+    expire  => expire_minutes ( 30 ),  # FIXME unknown
+    xform   => sub { return Butil::csv_field ( 1, shift ); }
+};
+
+
+push @bl, {
+    name    => 'dshield',
+    groups  => ['black'],
+    url     => 'https://feeds.dshield.org/block.txt',
+    expire  => expire_hours ( 24 ),
+    xform   => sub {
+        my $arg = shift;
+
+        if ( $arg =~ /^([0-9]\S+)\s+(?:\S+)\s+([0-9]+)\s+.*$/mx ) {
+            return ($1 . '/' . $2);
+        } else {
+            return undef;
+        }
+    }
+};
+
+push @bl, {
+    enabled => 1,
+    groups  => ['grey'],
+    name    => 'adblock-yoyo-dom',
+    url     => 'https://pgl.yoyo.org/adservers/serverlist.php?hostformat=nohtml&showintro=0&mimetype=plaintext',
+    expire  => expire_hours ( 24 )  # FIXME unknown
+};
+
+push @bl, {
+    enabled => 1,
+    groups  => ['grey'],
+    name    => 'adblock-yoyo-ip',
+    url     => 'https://pgl.yoyo.org/adservers/iplist.php?hostformat=nohtml&showintro=0&mimetype=plaintext',
+    expire  => expire_hours ( 24 )  # FIXME unknown
+};
+
+1;
