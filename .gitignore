@@ -6,6 +6,7 @@
 
 # compiled progs
 /bin/ipset-gen
+/bin/squid-acl-gen
 /bin/unbound-redirect-gen
 
 *.tmp

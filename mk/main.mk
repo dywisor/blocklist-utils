@@ -39,7 +39,7 @@ all: progs
 
 # addprefix <> patsubst ^%
 
-progs: $(S_BIN)/ipset-gen $(S_BIN)/unbound-redirect-gen
+progs: $(S_BIN)/ipset-gen $(S_BIN)/unbound-redirect-gen $(S_BIN)/squid-acl-gen
 
 C_COMMON_DEP = $(S_SRC_C)/main.c $(S_SRC_C)/main.h
 LAZY_COMPILE_C_PROG = $(CC) -static -std=c99 -D_POSIX_C_SOURCE=200809L -O2 -pipe -Wall -Wextra -pedantic
@@ -49,6 +49,9 @@ $(S_BIN)/ipset-gen: $(S_SRC_C)/ipset-gen.c $(C_COMMON_DEP)
 
 $(S_BIN)/unbound-redirect-gen: $(S_SRC_C)/unbound-redirect-gen.c $(C_COMMON_DEP)
 	$(LAZY_COMPILE_C_PROG) -o $(@) $(S_SRC_C)/unbound-redirect-gen.c
+
+$(S_BIN)/squid-acl-gen: $(S_SRC_C)/squid-acl-gen.c $(C_COMMON_DEP)
+	$(LAZY_COMPILE_C_PROG) -o $(@) $(S_SRC_C)/squid-acl-gen.c
 
 install:
 	false
