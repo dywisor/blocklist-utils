@@ -23,7 +23,7 @@ void print_help ( const char* const prog_name, FILE* const fh ) {
 }
 
 int main ( int argc, char** argv ) {
-    static const char* const SHORT_OPTS = "46chH:M:t:T:u";
+    static const char* const SHORT_OPTS = "h";
 
     int rc;
     int opt;
